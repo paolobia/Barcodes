@@ -14,7 +14,7 @@ Build/run (from the repo root, where `Barcodes.csproj` lives):
 ```
 dotnet build Barcodes.csproj
 dotnet run                       # serves on the URL in Properties/launchSettings.json
-dotnet run --urls=https://192.168.1.101:5134   # LAN URL used during on-device testing (see leggimi.txt)
+dotnet run --urls=https://192.168.1.101:5134   # example LAN URL for on-device testing (adjust IP to your machine)
 dotnet watch run --project Barcodes.csproj      # hot-reload dev loop
 dotnet publish -c Release --nologo              # outputs to bin/Release/net8.0/publish/wwwroot
 ```

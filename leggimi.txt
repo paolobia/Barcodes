@@ -1,3 +1,0 @@
-dotnet run --urls=https://192.168.1.101:5134
-https://192.168.1.101:5134
-bubblewrap init --manifest=http://192.168.1.101:5134/manifest.webmanifest
