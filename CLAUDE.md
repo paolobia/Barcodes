@@ -22,7 +22,7 @@ There is no test project in this repo — do not invent test commands.
 
 VS Code tasks (`.vscode/tasks.json`) wrap the same `build`/`publish`/`watch` commands.
 
-Deploy scripts (`bupdate.sh`, `nupdate.sh`) publish and `rsync` `bin/Release/net8.0/publish/wwwroot/` to the production host (barcodes.bialive.it) over `sshfs`. These are personal deployment scripts tied to the author's machine/mounts — don't assume they run in other environments, and don't invoke them without being asked.
+Deploy is automated via GitHub Actions (`.github/workflows/deploy.yml`): every push to `main` publishes the app and deploys it to GitHub Pages at `https://paolobia.github.io/Barcodes/`. There is no other production deployment — the previous `barcodes.bialive.it` host has been decommissioned; do not reference it or the old `bupdate.sh`/`nupdate.sh` deploy scripts.
 
 ## Architecture
 
@@ -40,8 +40,8 @@ Deploy scripts (`bupdate.sh`, `nupdate.sh`) publish and `rsync` `bin/Release/net
 - `getCurrentLocation()` — wraps `navigator.geolocation` in a Promise; used both to sort the list by distance on load (`LoadBarcodes`, Haversine distance in `Home.razor`) and to fill in Lat/Lng when adding/editing an entry.
 - `downloadFile(filename, content, contentType)` — triggers a browser download for JSON export.
 - `selectAndReadFile(accept)` — opens a file picker and resolves with file text, used for JSON import.
-- A version-check on `DOMContentLoaded` that fetches `https://barcodes.bialive.it/manifest.webmanifest` and alerts the user if the deployed version differs from the one cached in `localStorage['app-version']` — this is hardcoded to the production domain and will always hit that URL regardless of where the app is served from.
+- A version-check on `DOMContentLoaded` that fetches `https://paolobia.github.io/Barcodes/manifest.webmanifest` and alerts the user if the deployed version differs from the one cached in `localStorage['app-version']` — this is hardcoded to the GitHub Pages URL and will always hit that URL regardless of where the app is served from.
 
 **PWA/service worker**: standard Blazor WASM PWA setup — `wwwroot/service-worker.js` (dev) / `service-worker.published.js` (prod, referenced from the `.csproj`), asset manifest generated at publish time as `service-worker-assets.js`. `wwwroot/manifest.webmanifest` carries the app `version` field that the in-page version check compares against.
 
-**`wwwroot/barcodes.html`**: standalone static help page, linked from the app's UI as "HELP" (`https://barcodes.bialive.it/barcodes.html`) — not part of the Blazor render tree.
+**`wwwroot/barcodes.html`**: standalone static help page, linked from the app's UI as "HELP" (`https://paolobia.github.io/Barcodes/barcodes.html`) — not part of the Blazor render tree.
