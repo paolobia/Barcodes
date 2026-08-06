@@ -1,5 +1,7 @@
 # Barcodes Manager
 
+🔗 **App online**: https://paolobia.github.io/Barcodes/
+
 App web per gestire codici a barre: scansiona o genera un codice, associalo a un nome e a delle coordinate GPS, e ritrova rapidamente quello più vicino alla tua posizione attuale.
 
 Realizzata come **Blazor WebAssembly (.NET 8)**, funziona interamente lato client — tutti i dati vengono salvati nel `localStorage` del browser: non c'è alcun backend né database. È installabile come **PWA**.
@@ -40,4 +42,4 @@ Non esiste un progetto di test in questo repository.
 
 ## Deploy
 
-Il deploy su [GitHub Pages](https://pages.github.com/) è automatizzato tramite GitHub Actions (`.github/workflows/deploy.yml`) a ogni push su `main`.
+Il deploy su [GitHub Pages](https://pages.github.com/) è automatizzato tramite GitHub Actions (`.github/workflows/deploy.yml`) a ogni push su `main`, pubblicato su https://paolobia.github.io/Barcodes/.
