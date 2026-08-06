@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Barcodes Manager</title>
+</head>
+
+<body>
+<h1 id="guida-utente-barcodes">Guida Utente - Barcodes</h1>
+<h2 id="cos-barcodes-">Cos&#39;è Barcodes?</h2>
+<p>Barcodes è un&#39;applicazione web che ti permette di gestire tutte le tue tessere fedeltà dei supermercati in modo intelligente.<br />L&#39;app ti mostra automaticamente la tessera del supermercato più vicino alla tua posizione attuale, così avrai sempre a portata di mano la tessera giusta al momento giusto.</p>
+<p><big><strong><a href="https://barcodes.bialive.it" target="_blank">Qui per lanciare l'app</a></strong></big> poi da CHROME, dai puntini in alto, scegli "Aggiungi alla schermata Home" </p>
+<h2 id="caratteristiche-uniche">Caratteristiche Uniche</h2>
+<h3 id="-ordinamento-intelligente-per-distanza-">🎯 <strong>Ordinamento Intelligente per Distanza</strong></h3>
+<ul>
+<li>Quando apri l&#39;app, rileva automaticamente la tua posizione</li>
+<li>Ordina tutti i supermercati dal più vicino al più lontano</li>
+<li><strong>Mostra immediatamente il codice a barre del supermercato più vicino</strong></li>
+<li>Perfetto quando sei in giro e vuoi sapere subito quale tessera usare</li>
+</ul>
+<h3 id="-gestione-multi-supermercato-">🏪 <strong>Gestione Multi-Supermercato</strong></h3>
+<ul>
+<li>Salva la stessa tessera per diversi punti vendita della stessa catena</li>
+<li>Esempio: Tessera Coop 12345 → Coop Centro (Via Roma), Coop Nord (Via Milano)</li>
+<li>Ogni negozio ha la sua posizione specifica per un ordinamento preciso</li>
+</ul>
+<h3 id="-sistema-di-identificazione-univoco-">🔑 <strong>Sistema di Identificazione Univoco</strong></h3>
+<ul>
+<li>Ogni tessera è identificata univocamente dal <strong>Nome del supermercato</strong></li>
+<li>Cambiare il nome = creare una nuova tessera</li>
+<li>Mantenere il nome = modificare la tessera esistente</li>
+</ul>
+<h2 id="come-funziona-il-sistema">Come Funziona il Sistema</h2>
+<h3 id="logica-di-identificazione-delle-tessere">Logica di Identificazione delle Tessere</h3>
+<p><strong>Nome Univoco:</strong></p>
+<ul>
+<li>Il <strong>Nome</strong> è la chiave identificativa di ogni tessera</li>
+<li>Se inserisci un nome già esistente, modifichi quella tessera</li>
+<li>Se inserisci un nome nuovo, crei una nuova tessera</li>
+</ul>
+<p><strong>Esempi Pratici:</strong></p>
+<ul>
+<li>Nome: &quot;Esselunga Via Roma&quot; → Tessera specifica per quel punto vendita</li>
+<li>Nome: &quot;Coop Centro&quot; → Tessera per il Coop del centro città</li>
+<li>Nome: &quot;Coop Quartiere&quot; → Tessera per il Coop del tuo quartiere (stesso codice, posizione diversa)</li>
+</ul>
+<h3 id="gestione-tessere-multiple-per-stessa-catena">Gestione Tessere Multiple per Stessa Catena</h3>
+<p>Puoi salvare la stessa tessera per più punti vendita:</p>
+<ul>
+<li><strong>Tessera Coop 123456789</strong><ul>
+<li>&quot;Coop Via Roma&quot; (lat: 45.123, lon: 9.456)</li>
+<li>&quot;Coop Centro Commerciale&quot; (lat: 45.678, lon: 9.789)</li>
+<li>&quot;Coop Quartiere Nord&quot; (lat: 45.999, lon: 9.123)</li>
+</ul>
+</li>
+</ul>
+<p>L&#39;app mostrerà sempre quella del punto vendita più vicino a te!</p>
+<h2 id="come-usare-l-applicazione">Come Usare l&#39;Applicazione</h2>
+<h3 id="-primo-avvio">🚀 Primo Avvio</h3>
+<ol>
+<li>L&#39;app chiede il permesso di accedere alla tua posizione</li>
+<li>Rileva automaticamente dove ti trovi</li>
+<li>Ordina i supermercati salvati dal più vicino al più lontano</li>
+<li>Mostra il codice a barre del supermercato più vicino (se ne hai già salvati)</li>
+</ol>
+<h3 id="aggiungere-una-nuova-tessera">Aggiungere una Nuova Tessera</h3>
+<ol>
+<li><p><strong>Clicca &quot;Aggiungi Nuovo&quot;</strong></p>
+</li>
+<li><p><strong>Compila i Campi:</strong></p>
+<ul>
+<li><strong>Nome</strong>: Nome univoco del supermercato (es: &quot;Esselunga Corso Italia&quot;, &quot;Coop Via Roma&quot;)</li>
+<li><strong>Codice a Barre</strong>: Numero della tessera (usa lo scanner o inserisci manualmente)</li>
+<li><strong>Tipo</strong>: Viene rilevato automaticamente (EAN13, CODE128, ecc.)</li>
+<li><strong>Posizione</strong>: Clicca &quot;Recupera posizione Attuale&quot; per salvare la posizione del negozio</li>
+</ul>
+</li>
+<li><p><strong>Scansiona la Tessera:</strong></p>
+<ul>
+<li>Clicca &quot;Avvia&quot; per attivare la fotocamera</li>
+<li>Inquadra il codice a barre della tessera</li>
+<li>Il numero viene riconosciuto automaticamente</li>
+<li>Clicca &quot;Ferma&quot; quando completato</li>
+</ul>
+</li>
+<li><p><strong>Salva</strong>: Clicca &quot;Salva&quot; per memorizzare la tessera</p>
+</li>
+</ol>
+<h3 id="gestire-tessere-esistenti">Gestire Tessere Esistenti</h3>
+<p><strong>Modificare una Tessera:</strong></p>
+<ul>
+<li>Clicca &quot;✏️&quot; accanto alla tessera da modificare</li>
+<li><strong>Se mantieni lo stesso Nome</strong>: modifichi la tessera esistente</li>
+<li><strong>Se cambi il Nome</strong>: crei una nuova tessera con i nuovi dati</li>
+</ul>
+<p><strong>Aggiornare la Posizione:</strong></p>
+<ul>
+<li>Clicca &quot;📍&quot; accanto alla tessera</li>
+<li>L&#39;app aggiorna automaticamente la posizione con quella attuale</li>
+<li>Utile se il negozio si è trasferito o per correzioni</li>
+</ul>
+<p><strong>Eliminare una Tessera:</strong></p>
+<ul>
+<li>Clicca &quot;🗑️&quot; per eliminare definitivamente la tessera</li>
+</ul>
+<h3 id="visualizzazione-intelligente">Visualizzazione Intelligente</h3>
+<p><strong>Schermata Principale:</strong></p>
+<ul>
+<li><strong>Codice a Barre Grande</strong>: Sempre quello del supermercato più vicino</li>
+<li><strong>Lista Ordinata</strong>: Tutti i supermercati dal più vicino al più lontano</li>
+<li><strong>Icona GPS</strong> 🔍: Indica quando l&#39;app sta calcolando le distanze</li>
+</ul>
+<p><strong>Informazioni Mostrate:</strong></p>
+<ul>
+<li>Nome del supermercato</li>
+<li>Tipo di codice a barre</li>
+<li>Distanza dalla tua posizione (calcolata automaticamente)</li>
+</ul>
+<h2 id="strategie-d-uso-consigliate">Strategie d&#39;Uso Consigliate</h2>
+<h3 id="-per-catene-con-molti-punti-vendita-">🏪 <strong>Per Catene con Molti Punti Vendita</strong></h3>
+<p>Salva ogni punto vendita separatamente:</p>
+<ul>
+<li>&quot;Coop Via Roma&quot; (centro città)</li>
+<li>&quot;Coop Centro Commerciale&quot; (periferia)</li>
+<li>&quot;Coop Stazione&quot; (vicino alla stazione)</li>
+</ul>
+<h3 id="-per-la-spesa-quotidiana-">🛒 <strong>Per la Spesa Quotidiana</strong></h3>
+<ul>
+<li>Salva i supermercati che frequenti di più</li>
+<li>L&#39;app ti mostrerà automaticamente la tessera giusta in base a dove sei</li>
+<li>Non dovrai più cercare o ricordare quale tessera usare</li>
+</ul>
+<h3 id="-per-chi-viaggia-spesso-">🚗 <strong>Per Chi Viaggia Spesso</strong></h3>
+<ul>
+<li>Salva i supermercati delle località che visiti spesso</li>
+<li>Utile per seconde case, viaggi di lavoro, visite a parenti</li>
+<li>Ogni volta che torni in quella zona, avrai la tessera giusta</li>
+</ul>
+<h2 id="esempi-pratici-d-uso">Esempi Pratici d&#39;Uso</h2>
+<h3 id="scenario-1-stessa-tessera-negozi-diversi">Scenario 1: Stessa Tessera, Negozi Diversi</h3>
+<pre><code>Tessera Coop: 1234567890
+
+Negozio 1:
+-<span class="ruby"> <span class="hljs-symbol">Nome:</span> <span class="hljs-string">"Coop Via Roma"</span>
+</span>-<span class="ruby"> <span class="hljs-symbol">Codice:</span> <span class="hljs-number">1234567890</span>
+</span>-<span class="ruby"> <span class="hljs-symbol">Posizione:</span> Centro città
+</span>
+Negozio 2:
+-<span class="ruby"> <span class="hljs-symbol">Nome:</span> <span class="hljs-string">"Coop Quartiere"</span>
+</span>-<span class="ruby"> <span class="hljs-symbol">Codice:</span> <span class="hljs-number">1234567890</span>
+</span>-<span class="ruby"> <span class="hljs-symbol">Posizione:</span> Zona residenziale</span>
+</code></pre><h3 id="scenario-2-tessere-diverse-per-catene-diverse">Scenario 2: Tessere Diverse per Catene Diverse</h3>
+<pre><code>Tessera 1:
+-<span class="ruby"> <span class="hljs-symbol">Nome:</span> <span class="hljs-string">"Esselunga Corso Italia"</span>
+</span>-<span class="ruby"> <span class="hljs-symbol">Codice:</span> <span class="hljs-number">9876543210</span>
+</span>
+Tessera 2:
+-<span class="ruby"> <span class="hljs-symbol">Nome:</span> <span class="hljs-string">"Carrefour Zona Nord"</span>
+</span>-<span class="ruby"> <span class="hljs-symbol">Codice:</span> <span class="hljs-number">5555666677</span></span>
+</code></pre><h2 id="backup-e-ripristino">Backup e Ripristino</h2>
+<h3 id="esportare-i-dati">Esportare i Dati</h3>
+<ol>
+<li>Clicca &quot;Esporta JSON&quot;</li>
+<li>Salva il file come backup</li>
+<li>Il file contiene tutte le tessere con posizioni</li>
+</ol>
+<h3 id="importare-i-dati">Importare i Dati</h3>
+<ol>
+<li>Clicca &quot;Importa JSON&quot;</li>
+<li>Seleziona il file precedentemente esportato</li>
+<li>⚠️ <strong>Attenzione</strong>: Sostituisce tutti i dati esistenti</li>
+</ol>
+<h2 id="consigli-per-un-uso-ottimale">Consigli per un Uso Ottimale</h2>
+<h3 id="-per-la-scansione-">📱 <strong>Per la Scansione</strong></h3>
+<ul>
+<li>Tessere in plastica: pulisci prima di scansionare</li>
+<li>Buona illuminazione per il riconoscimento automatico</li>
+<li>Tieni il telefono stabile durante la scansione</li>
+</ul>
+<h3 id="-per-la-geolocalizzazione-">📍 <strong>Per la Geolocalizzazione</strong></h3>
+<ul>
+<li>Salva la posizione mentre sei fisicamente al supermercato</li>
+<li>Più precisa è la posizione, migliore è l&#39;ordinamento</li>
+<li>Aggiorna la posizione se il negozio si trasferisce</li>
+</ul>
+<h3 id="-per-l-organizzazione-">🏪 <strong>Per l&#39;Organizzazione</strong></h3>
+<ul>
+<li>Usa nomi descrittivi: &quot;Coop Via Roma&quot; invece di solo &quot;Coop&quot;</li>
+<li>Includi riferimenti geografici: &quot;Centro&quot;, &quot;Nord&quot;, &quot;Stazione&quot;</li>
+<li>Mantieni i nomi coerenti per facile riconoscimento</li>
+</ul>
+<h2 id="risoluzione-problemi">Risoluzione Problemi</h2>
+<p><strong>La posizione non viene rilevata:</strong></p>
+<ul>
+<li>Controlla i permessi di localizzazione</li>
+<li>Verifica GPS attivo</li>
+<li>Prova a riavviare l&#39;app</li>
+</ul>
+<p><strong>Tessera non riconosciuta:</strong></p>
+<ul>
+<li>Pulisci il codice a barre</li>
+<li>Migliora l&#39;illuminazione</li>
+<li>Inserisci manualmente se necessario</li>
+</ul>
+<p><strong>Ho creato una tessera duplicata:</strong></p>
+<ul>
+<li>Elimina quella non desiderata</li>
+<li>Ricorda: il Nome è l&#39;identificativo univoco</li>
+</ul>
+<hr>
+<p><strong>💡 Suggerimento Finale:</strong> Questa app è perfetta per chi ha molte tessere fedeltà e vuole sempre avere quella giusta a portata di mano, senza dover cercare o ricordare quale usare in base a dove si trova!</p>
+</body>
+
+</html>

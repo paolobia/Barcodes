@@ -1,0 +1,397 @@
+﻿@page "/"
+@using Barcodes.Models
+@using Barcodes.Services
+
+@inject BarcodeService BarcodeService
+@inject GenerateBarcode GenerateBarcode
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Barcodes Manager</PageTitle>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            
+            <!-- Form di aggiunta/modifica -->
+            @if (showForm)
+            {
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            @if (editingBarcode?.Name != null)
+                            {
+                                <i class="fas fa-edit"></i> <text>Modifica Codice a Barre</text>
+                            }
+                            else
+                            {
+                                <i class="fas fa-plus"></i> <text>Nuovo Codice a Barre</text>
+                            }
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nome *</label>
+                                    <input @bind="editingBarcode.Name" class="form-control" placeholder="Nome identificativo" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Codice a Barre *</label>
+                                    <input @bind="editingBarcode.Code" type="text" class="form-control" id="barcode-input" placeholder="Il codice scannerizzato apparirà qui..." readonly /> <span id="status"></span>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button class="btn btn-info flex-grow-1" id="start-btn" onclick="startScanner()">
+                                            <i class="fas fa-play me-1"></i> Avvia
+                                        </button>
+                                        <button class="btn btn-danger flex-grow-1" id="stop-btn" onclick="stopScanner()" disabled>
+                                            <i class="fas fa-stop me-1"></i> Ferma
+                                        </button>
+                                        <button class="btn btn-danger flex-grow-1" onclick="clearInput()">
+                                            <i class="fas fa-trash me-1"></i> Pulisci
+                                        </button>
+                                    </div>
+                                    <div id="scanner-container" class="hidden"> 
+                                        <div class="overlay" id="scanning-line"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Tipo</label>
+                                    <input @bind="editingBarcode.Label" class="form-control" placeholder="EAN13 CODE128 CODE39 EAN8 UPC" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Latitudine</label>
+                                    <input @bind="editingBarcode.Latitude" type="number" step="any" class="form-control" placeholder="0.000000" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Longitudine</label>
+                                    <input @bind="editingBarcode.Longitude" type="number" step="any" class="form-control" placeholder="0.000000" />
+                                </div>
+                                <div class="mb-3">
+                                    <button class="btn btn-sm btn-outline-primary ms-2" @onclick="GetCurrentLocation">
+                                        <i class="fas fa-location-crosshairs"></i> Recupera posizione Attuale
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <img src="@GenerateBarcode.Generate(editingBarcode.Code, editingBarcode.Label)" alt="Barcode" class="img-fluid" />
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success" @onclick="SaveBarcode" disabled="@(!IsFormValid())">
+                                <i class="fas fa-save"></i> Salva
+                            </button>
+                            <button class="btn btn-secondary" @onclick="CancelEdit">
+                                <i class="fas fa-times"></i> Annulla
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Lista codici a barre -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                        <i class="fas fa-list"></i>
+                                        Codici a Barre (@filteredBarcodes.Count)
+                                </div>
+                                <a href="https://barcodes.bialive.it/barcodes.html" class="btn btn-primary">
+                                    <i class="fas fa-question-circle me-2"></i>HELP
+                                </a>
+                            </div>
+                            @if( searching )
+                            {
+                                <div class="text-center text-muted py-5">
+                                    <i class="fas fa-magnifying-glass-location gps-search"></i>
+                                    <h5>Ricerca posizione in corso...</h5>
+                                </div>
+                            }
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <input @bind="searchTerm" @bind:event="oninput" @bind:after="OnSearchChanged"
+                                   class="form-control" placeholder="Cerca per nome..." />
+                            @if (!string.IsNullOrEmpty(searchTerm))
+                            {
+                                <span class="text-muted">Filtrati per: "@searchTerm"</span>
+                            }
+                        </div>
+                        @if (!filteredBarcodes.Any())
+                        {
+                            <div class="d-flex text-end">
+                                <button class="btn btn-primary" @onclick="ShowAddForm">
+                                    <i class="fas fa-plus"></i> Aggiungi Nuovo
+                                </button>
+                            </div>
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-inbox fa-3x mb-3"></i>
+                                <h5>Nessun codice a barre trovato</h5>
+                                <p>
+                                    @if (string.IsNullOrEmpty(searchTerm))
+                                    {
+                                        <text>Inizia aggiungendo il tuo primo codice a barre.</text>
+                                    }
+                                    else
+                                    {
+                                        <text>Nessun risultato per la ricerca "@searchTerm".</text>
+                                    }
+                                </p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex flex-column gap-2" style="margin-bottom: 10px;">
+                                <div style="margin-bottom: 10px; text-align: center; display: block; width: 100%;">
+                                    <img src="@GenerateBarcode.Generate(@filteredBarcodes[0].Code, @filteredBarcodes[0].Label)"  alt="@filteredBarcodes[0].Code" class="img-fluid" />
+                                    <div><strong>@filteredBarcodes[0].Name @filteredBarcodes[0].Label</strong></div>
+                                </div>
+                            </div>
+                            <hr style="margin-top: 10px;">
+                            <div class="d-flex flex-column gap-2">
+                                @foreach (var barcode in filteredBarcodes)
+                                {
+                                    <div @key="barcode.Name" style="margin-bottom: 10px; text-align: center; display: block; width: 100%;">
+                                        <div>
+                                            <div class="h3">@barcode.Name</div>
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <button class="btn btn-outline-primary flex-grow-1" @onclick="() => EditBarcode(barcode)">
+                                                <i class="fas fa-edit me-1"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger flex-grow-1" @onclick="() => DeleteBarcode(barcode)">
+                                                <i class="fas fa-trash me-1"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        <div class="d-flex flex-column gap-3"> <!-- Contenitore principale con gap verticale -->
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-primary flex-grow-1" @onclick="ShowAddForm">
+                                    <i class="fas fa-plus"></i> Aggiungi Nuovo
+                                </button>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-info flex-grow-1" @onclick="ExportData">
+                                    <i class="fas fa-download me-1"></i> Esporta JSON
+                                </button>
+                                <button class="btn btn-danger flex-grow-1" @onclick="ImportData">
+                                    <i class="fas fa-upload me-1"></i> Importa JSON
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    // dotnet run --urls=https://192.168.1.101:5134
+    private List<BarcodeItem> allBarcodes = new();
+    private List<BarcodeItem> filteredBarcodes = new();
+    private BarcodeItem editingBarcode = new();
+    private bool showForm = false;
+    private string searchTerm = string.Empty; // vedremo...
+    private bool searching = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBarcodes();
+    }
+
+    private async Task LoadBarcodes()
+    {
+        allBarcodes = await BarcodeService.GetAllBarcodesAsync();
+        filteredBarcodes = allBarcodes;
+        searching = true;
+        StateHasChanged();
+
+        try
+        {
+            var location = await JSRuntime.InvokeAsync<double[]>("getCurrentLocation");
+            if (location != null && location.Length >= 3)
+            {
+                double Latitude = location[0];
+                double Longitude = location[1];
+                var orderedList = allBarcodes
+                    .OrderBy(item => CalculateHaversineDistance(
+                        item.Latitude, 
+                        item.Longitude, 
+                        Latitude, 
+                        Longitude))
+                    .ToList();
+                filteredBarcodes = orderedList;
+            }
+            else
+                filteredBarcodes = allBarcodes;
+        }
+        catch(Exception ex)
+        {
+            filteredBarcodes = allBarcodes;
+        }
+        searching = false;
+        StateHasChanged();
+    }
+
+    public static double CalculateHaversineDistance(double lat1, double lon1, double lat2, double lon2)
+    {
+        const double R = 6371; // Raggio della Terra in km
+        var dLat = (lat2 - lat1) * Math.PI / 180;
+        var dLon = (lon2 - lon1) * Math.PI / 180;
+        var a =
+            Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+            Math.Cos(lat1 * Math.PI / 180) * Math.Cos(lat2 * Math.PI / 180) *
+            Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        return R * c; // Distanza in km
+    }
+    private async Task OnSearchChanged()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredBarcodes = allBarcodes;
+        }
+        else
+        {
+            filteredBarcodes = await BarcodeService.SearchByNameAsync(searchTerm);
+        }
+        StateHasChanged();
+    }
+
+
+    private void ShowAddForm()
+    {
+        editingBarcode = new BarcodeItem();
+        showForm = true;
+    }
+
+    private void EditBarcode(BarcodeItem barcode)
+    {
+        editingBarcode = new BarcodeItem
+        {
+            Name = barcode.Name,
+            Code = barcode.Code,
+            Label = barcode.Label,
+            Latitude = barcode.Latitude,
+            Longitude = barcode.Longitude,
+        };
+        showForm = true;
+    }
+
+    private async Task CancelEdit()
+    {
+        await JSRuntime.InvokeVoidAsync("stopScanner");
+        editingBarcode = new BarcodeItem();
+        showForm = false;
+    }
+
+    private async Task SaveBarcode()
+    {
+        if (!IsFormValid()) return;
+
+        try
+        {
+            await BarcodeService.SaveBarcodeAsync(editingBarcode);
+            await JSRuntime.InvokeVoidAsync("stopScanner");
+            await LoadBarcodes();
+            await OnSearchChanged();
+            editingBarcode = new BarcodeItem();
+            showForm = false;
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Errore nel salvataggio: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteBarcode(BarcodeItem barcode)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm",
+            $"Sei sicuro di voler eliminare il codice a barre '{barcode.Name}' '{barcode.Label}'?");
+        
+        if (confirmed)
+        {
+            await BarcodeService.DeleteBarcodeAsync(barcode.Name);
+            await LoadBarcodes();
+            await OnSearchChanged();
+        }
+    }
+
+    private async Task GetCurrentLocation()
+    {
+        try
+        {
+            var location = await JSRuntime.InvokeAsync<double[]>("getCurrentLocation");
+            if (location != null && location.Length >= 3)
+            {
+                editingBarcode.Latitude = location[0];
+                editingBarcode.Longitude = location[1];
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Impossibile ottenere la posizione: {ex.Message}");
+        }
+    }
+
+    private bool IsFormValid()
+    {
+        return !string.IsNullOrWhiteSpace(editingBarcode.Name) && 
+               !string.IsNullOrWhiteSpace(editingBarcode.Code);
+    }
+
+    private async Task ExportData()
+    {
+        try
+        {
+            var jsonData = await BarcodeService.ExportToJsonAsync();
+            var fileName = $"barcodes_export_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+            
+            await JSRuntime.InvokeVoidAsync("downloadFile", fileName, jsonData, "application/json");
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Errore nell'esportazione: {ex.Message}");
+        }
+    }
+
+    private async Task ImportData()
+    {
+        try
+        {
+            var fileContent = await JSRuntime.InvokeAsync<string>("selectAndReadFile", ".json");
+            
+            if (string.IsNullOrEmpty(fileContent))
+            {
+                return; // Utente ha annullato la selezione
+            }
+
+            // Conferma per sostituzione completa
+            var confirm = await JSRuntime.InvokeAsync<bool>("confirm", 
+                "Questa operazione sostituirà TUTTI i dati esistenti. Continuare?");
+            if (!confirm) return;
+
+            var importedCount = await BarcodeService.ImportFromJsonAsync(fileContent, true);
+            
+            await LoadBarcodes();
+            await OnSearchChanged();
+            
+            await JSRuntime.InvokeVoidAsync("alert", 
+                $"Importazione completata con successo!\n{importedCount} elementi importati.");
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Errore nell'importazione: {ex.Message}");
+        }
+    }
+
+}

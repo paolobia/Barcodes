@@ -1,0 +1,13 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+
+## Node (in caso di tool futuri)
+node_modules/
+npm-debug.log*
+
+## OS / editor
+.DS_Store
+Thumbs.db

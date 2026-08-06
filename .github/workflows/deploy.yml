@@ -1,0 +1,81 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  actions: write
+  deployments: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  REPO_NAME: ${{ github.event.repository.name }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish
+        run: dotnet publish Barcodes.csproj -c Release -o publish_output
+
+      - name: Adatta base href per GitHub Pages
+        run: |
+          sed -i "s|<base href=\"/\" />|<base href=\"/${REPO_NAME}/\" />|" publish_output/wwwroot/index.html
+
+      - name: Fallback SPA (404 -> index) e disabilita Jekyll
+        run: |
+          cp publish_output/wwwroot/index.html publish_output/wwwroot/404.html
+          touch publish_output/wwwroot/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: publish_output/wwwroot
+
+      - name: Deploy su GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Pulizia run e deployment precedenti
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          REPO="${{ github.repository }}"
+
+          echo "Elimino le run di Actions precedenti a quella corrente..."
+          gh run list --repo "$REPO" --workflow=deploy.yml --json databaseId,status --limit 100 \
+            | jq -r --arg current "$GITHUB_RUN_ID" \
+              '.[] | select(.databaseId != ($current | tonumber)) | select(.status == "completed") | .databaseId' \
+            | while read -r run_id; do
+                echo "Elimino run $run_id"
+                gh api -X DELETE "repos/$REPO/actions/runs/$run_id" || true
+              done
+
+          echo "Elimino i deployment precedenti dell'ambiente github-pages..."
+          gh api "repos/$REPO/deployments?environment=github-pages&per_page=100" \
+            | jq -r 'sort_by(.created_at) | reverse | .[1:][].id' \
+            | while read -r dep_id; do
+                echo "Disattivo e elimino deployment $dep_id"
+                gh api -X POST "repos/$REPO/deployments/$dep_id/statuses" -f state=inactive || true
+                gh api -X DELETE "repos/$REPO/deployments/$dep_id" || true
+              done

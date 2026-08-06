@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barcodes Manager</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link href="css/all.min.css" rel="stylesheet" />
+
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="manifest.webmanifest" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+
+    <script src="quagga.min.js"></script>
+    <!-- Font Awesome per le icone -->
+
+    <script src="JsBarcode.all.min.js"></script>
+
+    <script type="text/javascript">
+    
+        window.generateBarcodeSync = (value, tipo) => {
+            try {
+                // Crea un canvas temporaneo
+                const canvas = document.createElement('canvas');
+                
+                JsBarcode(canvas, value, {
+                    format: tipo,
+                    width: 2,
+                    height: 100,
+                    displayValue: true,
+                    fontSize: 14,
+                    textAlign: "center",
+                    textPosition: "bottom",
+                    background: "#ffffff",
+                    lineColor: "#000000"
+                });
+                
+                // Converti il canvas in data URL
+                return canvas.toDataURL('image/png');
+            } catch (error) {
+                console.error("Errore nella generazione del codice a barre:", error);
+                // Ritorna un'immagine 1x1 trasparente in caso di errore
+                return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+            }
+        };
+
+        window.downloadFile = (filename, content, contentType) => {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        // Funzione per selezionare e leggere un file
+        window.selectAndReadFile = (accept) => {
+            return new Promise((resolve, reject) => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = accept;
+                
+                input.onchange = (event) => {
+                    const file = event.target.files[0];
+                    if (!file) {
+                        resolve(null);
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        resolve(e.target.result);
+                    };
+                    reader.onerror = (e) => {
+                        reject(new Error('Errore nella lettura del file'));
+                    };
+                    reader.readAsText(file);
+                };
+                
+                input.click();
+            });
+        };
+
+
+        // Avvia il controllo all'avvio dell'app
+        document.addEventListener('DOMContentLoaded', () => {
+        // Aspetta 2 secondi per dare tempo al caricamento completo
+        setTimeout(checkVersionOnStartup, 2000);
+        });
+
+        // Versione ancora più semplice se preferisci solo console.log
+        async function checkVersionOnStartup() 
+        {
+            try {
+                const localVersion = localStorage.getItem('app-version') || '1.0';
+                const response = await fetch('https://barcodes.bialive.it/manifest.webmanifest', { cache: 'no-cache' });
+                const manifest = await response.json();
+                const serverVersion = manifest.version || '1.0';
+                
+                if (serverVersion !== localVersion) 
+                {
+                    alert(`Nuova versione disponibile: ${serverVersion} (attuale: ${localVersion})`);
+                    localStorage.setItem('app-version', serverVersion);
+                }
+            } catch (error) 
+            {
+                console.error('Errore controllo versione:', error);
+            }
+        }
+
+        let scannerStarted = false;
+        
+        function startScanner() {
+            const scannerContainer = document.getElementById('scanner-container');
+            const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const status = document.getElementById('status');
+            
+            // Mostra il container dello scanner
+            scannerContainer.classList.remove('hidden');
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            
+            status.innerHTML = 'Inizializzazione scanner...';
+            
+            // Configurazione QuaggaJS
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#scanner-container'),
+                    constraints: {
+                        width: 640,
+                        height: 120,
+                        facingMode: "environment" // Usa la fotocamera posteriore su mobile
+                    }
+                },
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
+                },
+                numOfWorkers: 2,
+                decoder: {
+                    readers: [
+                        "ean_reader",
+                        "code_128_reader",
+                        "ean_8_reader",
+                        "code_39_reader",
+                    ]
+                },
+                locate: true
+            }, function(err) {
+                if (err) {
+                    console.error('Errore inizializzazione scanner:', err);
+                    status.innerHTML = 'Errore: ' + err.message;
+                    resetButtons();
+                    return;
+                }
+                
+                console.log("Scanner inizializzato correttamente");
+                status.innerHTML = 'Scanner attivo - Posiziona il codice a barre davanti alla fotocamera';
+                Quagga.start();
+                scannerStarted = true;
+            });
+            
+            // Event listener per la decodifica
+            Quagga.onDetected(function(data) {
+                const code = data.codeResult.code;
+                const input = document.getElementById('barcode-input');
+                
+                // Riempi il campo input con il codice scannerizzato
+                input.value = code;
+                
+                console.log('Codice rilevato:', code);
+                status.innerHTML = `Codice rilevato: ${code}`;
+                
+                // Opzionale: ferma automaticamente lo scanner dopo la scansione
+                // stopScanner();
+            });
+        }
+        
+        function stopScanner() {
+            if (scannerStarted) {
+                Quagga.stop();
+                scannerStarted = false;
+                
+                const scannerContainer = document.getElementById('scanner-container');
+                scannerContainer.classList.add('hidden');
+                
+                document.getElementById('status').innerHTML = 'Scanner fermato';
+                resetButtons();
+            }
+        }
+        
+        function resetButtons() {
+            const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+        
+        function clearInput() {
+            document.getElementById('barcode-input').value = '';
+            document.getElementById('status').innerHTML = '';
+        }
+        
+        // Gestione errori
+        Quagga.onProcessed(function(result) {
+            const drawingCtx = Quagga.canvas.ctx.overlay;
+            const drawingCanvas = Quagga.canvas.dom.overlay;
+            
+            if (result) {
+                // Disegna le linee di scanning
+                if (result.boxes) {
+                    drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+                    result.boxes.filter(function (box) {
+                        return box !== result.box;
+                    }).forEach(function (box) {
+                        Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
+                    });
+                }
+                
+                if (result.box) {
+                    Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
+                }
+                
+                if (result.codeResult && result.codeResult.code) {
+                    Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
+                }
+            }
+        });
+        
+        // Cleanup quando la pagina viene chiusa
+        window.addEventListener('beforeunload', function() {
+            if (scannerStarted) {
+                Quagga.stop();
+            }
+        });
+    </script>
+
+</head>
+
+<body>
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+
+    <div id="blazor-error-ui">
+        Si è verificato un errore non gestito.
+        <a href="" class="reload">Ricarica</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>navigator.serviceWorker.register('service-worker.js');</script>
+    
+    <script>
+        // Funzione per ottenere la posizione GPS corrente
+        window.getCurrentLocation = () => {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocalizzazione non supportata dal browser'));
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const coords = [
+                            position.coords.latitude,
+                            position.coords.longitude,
+                            position.coords.altitude || 0
+                        ];
+                        resolve(coords);
+                    },
+                    (error) => {
+                        let message;
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                message = "Permesso di geolocalizzazione negato dall'utente.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                message = "Informazioni sulla posizione non disponibili.";
+                                break;
+                            case error.TIMEOUT:
+                                message = "La richiesta di geolocalizzazione è scaduta.";
+                                break;
+                            default:
+                                message = "Errore sconosciuto nella geolocalizzazione.";
+                                break;
+                        }
+                        reject(new Error(message));
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            });
+        };
+    </script>
+</body>
+
+</html>
