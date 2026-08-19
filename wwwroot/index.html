@@ -177,7 +177,9 @@
                 
                 // Riempi il campo input con il codice scannerizzato
                 input.value = code;
-                
+                // Notifica Blazor del cambiamento (il binding ascolta l'evento "change")
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+
                 console.log('Codice rilevato:', code);
                 status.innerHTML = `Codice rilevato: ${code}`;
                 
@@ -208,7 +210,9 @@
         }
         
         function clearInput() {
-            document.getElementById('barcode-input').value = '';
+            const input = document.getElementById('barcode-input');
+            input.value = '';
+            input.dispatchEvent(new Event('change', { bubbles: true }));
             document.getElementById('status').innerHTML = '';
         }
         

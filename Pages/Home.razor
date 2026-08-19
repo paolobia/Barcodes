@@ -37,7 +37,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Codice a Barre *</label>
-                                    <input @bind="editingBarcode.Code" type="text" class="form-control" id="barcode-input" placeholder="Il codice scannerizzato apparirà qui..." readonly /> <span id="status"></span>
+                                    <input @bind="editingBarcode.Code" type="text" class="form-control" id="barcode-input" placeholder="Inserisci o scannerizza il codice" /> <span id="status"></span>
                                     <div class="d-flex flex-wrap gap-2">
                                         <button class="btn btn-info flex-grow-1" id="start-btn" onclick="startScanner()">
                                             <i class="fas fa-play me-1"></i> Avvia
@@ -99,7 +99,7 @@
                                         <i class="fas fa-list"></i>
                                         Codici a Barre (@filteredBarcodes.Count)
                                 </div>
-                                <a href="https://paolobia.github.io/Barcodes/barcodes.html" class="btn btn-primary">
+                                <a href="https://github.com/paolobia/Barcodes#readme" class="btn btn-primary">
                                     <i class="fas fa-question-circle me-2"></i>HELP
                                 </a>
                             </div>
