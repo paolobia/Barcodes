@@ -96,7 +96,7 @@
                         <h5 class="mb-0">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                        <i class="fas fa-list"></i>
+                                        <span class="text-muted">V @AppVersion</span>
                                         Codici a Barre (@filteredBarcodes.Count)
                                 </div>
                                 <a href="https://github.com/paolobia/Barcodes#readme" class="btn btn-primary">
@@ -195,6 +195,7 @@
 
 @code {
     // dotnet run --urls=https://192.168.1.101:5134
+    private const string AppVersion = "1.4"; // tenere allineata a wwwroot/manifest.webmanifest
     private List<BarcodeItem> allBarcodes = new();
     private List<BarcodeItem> filteredBarcodes = new();
     private BarcodeItem editingBarcode = new();
