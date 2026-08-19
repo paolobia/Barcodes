@@ -1,6 +1,7 @@
 # Barcodes Manager
 
 🔗 **App online**: https://paolobia.github.io/Barcodes/
+🏷️ **Versione**: 1.4
 
 App web per gestire codici a barre: scansiona o genera un codice, associalo a un nome e a delle coordinate GPS, e ritrova rapidamente quello più vicino alla tua posizione attuale.
 
@@ -43,3 +44,9 @@ Non esiste un progetto di test in questo repository.
 ## Deploy
 
 Il deploy su [GitHub Pages](https://pages.github.com/) è automatizzato tramite GitHub Actions (`.github/workflows/deploy.yml`) a ogni push su `main`, pubblicato su https://paolobia.github.io/Barcodes/.
+
+## Changelog
+
+Numerazione a due cifre (`major.minor`), aggiornata insieme a `wwwroot/manifest.webmanifest` e alla costante `AppVersion` in `Pages/Home.razor`.
+
+- **1.4** (2026-08-19) — Corretto lo zoom eccessivo dello scanner (rapporto fotocamera portato da 640x120 a 4:3 ideale); il numero di versione è ora mostrato nell'header della lista al posto dell'icona decorativa; introdotto lo schema di versionamento a due cifre.
