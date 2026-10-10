@@ -34,12 +34,14 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Publish
-        run: dotnet publish Barcodes.csproj -c Release -o publish_output
-
+      # Il base href va modificato PRIMA del publish: il service worker verifica l'hash
+      # di integrità di index.html, quindi cambiarlo dopo rompe l'installazione offline.
       - name: Adatta base href per GitHub Pages
         run: |
-          sed -i "s|<base href=\"/\" />|<base href=\"/${REPO_NAME}/\" />|" publish_output/wwwroot/index.html
+          sed -i "s|<base href=\"/\" />|<base href=\"/${REPO_NAME}/\" />|" wwwroot/index.html
+
+      - name: Publish
+        run: dotnet publish Barcodes.csproj -c Release -o publish_output
 
       - name: Fallback SPA (404 -> index) e disabilita Jekyll
         run: |

@@ -1,6 +1,6 @@
 {
   "name": "Barcodes Manager",
-  "version": "1.4",
+  "version": "1.5",
   "short_name": "Barcodes",
   "start_url": "./",
   "display": "standalone",
